@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="map" style="height: 512px">
+
+</div>
+
+@section Scripts {
+    <script>
+        var adtSize = 51200 / 96;
+
+        var map = L.map('map', {    
+            crs: L.CRS.Simple,
+            center: [0,0],
+            zoom: 0
+        });
+
+        var mapName = "0 - Eastern Kingdoms"
+        L.tileLayer(window.location.origin + '/tiles/' + mapName +  '/{z}/{x}/{y}', {
+            maxZoom: 6,
+            minZoom: 0,
+            bounds: [[0,0],[-512,512]],
+            zoomReverse: true,
+            tileSize: 512
+        }).addTo(map);
+
+        map.setView([-327.5,256], 0)
+        map.on('click', function (e) {
+           console.log(e);
+           
+           var clickedCoord = e.latlng;
+
+           var normalizedY = (clickedCoord.lat * -1) / 512;
+           var normalizedX = clickedCoord.lng / 512
+
+           var tileY = Math.floor(normalizedY * 64);
+           var tileX = Math.floor(normalizedX * 64);
+
+           var adtToCenterX = normalizedY * 64 - 32;
+           var adtToCenterY = normalizedX * 64 - 32;
+
+           var gameX = -Math.floor(adtToCenterX * adtSize)
+           var gameY = -Math.floor(adtToCenterY * adtSize)
+           L.popup()
+            .setLatLng(clickedCoord)
+            .setContent(`In-game coordinates<br/>x: ${gameX}, y: ${gameY}`)
+            .openOn(map);
+        });
+
+    </script>
+}
